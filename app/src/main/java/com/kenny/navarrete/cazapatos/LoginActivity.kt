@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
 
-        LeerDatosEnArchivoInterno()
+        LeerDatosEnArchivoExterno()
 
         //Eventos clic
         buttonLogin.setOnClickListener {
@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
             //Validaciones de datos requeridos y formatos
             if(!validateRequiredData())
                 return@setOnClickListener
-            EscribirDatosEnArchivoInterno()
+            EscribirDatosEnArchivoExterno()
             //Si pasa validación de datos requeridos, ir a pantalla principal
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra(EXTRA_LOGIN, email)
@@ -138,6 +138,24 @@ class LoginActivity : AppCompatActivity() {
         manejadorArchivo = FileInternalManager(this)
         datoLeido = manejadorArchivo.ReadInformation()
         Log.d("TAG", "FileInternalManager " + datoLeido.toList().toString())
+    }
+
+    // Sistema Externo de archivos
+    private fun EscribirDatosEnArchivoExterno(){
+        val email = editTextEmail.text.toString()
+        val clave = editTextPassword.text.toString()
+
+        manejadorArchivo = FileExternalManager(this)
+        manejadorArchivo.SaveInformation(email to clave)
+    }
+
+    // Sistema Externo de archivos
+    private fun LeerDatosEnArchivoExterno(){
+        var datoLeido : Pair<String, String>
+
+        manejadorArchivo = FileExternalManager(this)
+        datoLeido = manejadorArchivo.ReadInformation()
+        Log.d("TAG", "FileExternalManager " + datoLeido.toList().toString())
     }
 
     override fun onDestroy() {
