@@ -1,5 +1,6 @@
 package com.kenny.navarrete.cazapatos
 
+import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import java.io.FileOutputStream
 
 class LoginActivity : AppCompatActivity() {
     lateinit var manejadorArchivo: FileHandler
@@ -35,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
 
-        LeerDatosDePreferenciasEncryp()
+        LeerDatosEnArchivoInterno()
 
         //Eventos clic
         buttonLogin.setOnClickListener {
@@ -44,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
             //Validaciones de datos requeridos y formatos
             if(!validateRequiredData())
                 return@setOnClickListener
-            GuardarDatosEnPreferenciasEncryp()
+            EscribirDatosEnArchivoInterno()
             //Si pasa validación de datos requeridos, ir a pantalla principal
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra(EXTRA_LOGIN, email)
@@ -120,6 +122,23 @@ class LoginActivity : AppCompatActivity() {
         Log.d("TAG", "EncriptedSharedPreferencesManager " + datoLeido.toList().toString())
     }
 
+    // Sistema Interno de archivos
+    private fun EscribirDatosEnArchivoInterno(){
+        val email = editTextEmail.text.toString()
+        val clave = editTextPassword.text.toString()
+
+        manejadorArchivo = FileInternalManager(this)
+        manejadorArchivo.SaveInformation(email to clave)
+    }
+
+    // Sistema interno de archivos
+    private fun LeerDatosEnArchivoInterno(){
+        var datoLeido : Pair<String, String>
+
+        manejadorArchivo = FileInternalManager(this)
+        datoLeido = manejadorArchivo.ReadInformation()
+        Log.d("TAG", "FileInternalManager " + datoLeido.toList().toString())
+    }
 
     override fun onDestroy() {
         mediaPlayer.release()
