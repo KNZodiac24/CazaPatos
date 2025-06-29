@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-class EncryptedSharedPreferences  (actividad: Activity): FileHandler {
+class EncryptedSharedPreferencesManager (actividad: Activity):FileHandler {
     //Validar si existen datos en archivo de preferencia, y cargar
     val masterKey = MasterKey.Builder(actividad)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -18,7 +18,7 @@ class EncryptedSharedPreferences  (actividad: Activity): FileHandler {
     )
     override fun SaveInformation(datosAGrabar:Pair<String,String>){
         val editor = sharedPreferences.edit()
-        editor.putString(LOGIN_KEY,datosAGrabar.second)
+        editor.putString(LOGIN_KEY,datosAGrabar.first)
         editor.putString(PASSWORD_KEY,datosAGrabar.second)
         editor.apply()
     }

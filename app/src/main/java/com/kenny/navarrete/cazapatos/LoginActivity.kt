@@ -3,6 +3,7 @@ package com.kenny.navarrete.cazapatos
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -34,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
 
-        LeerDatosDePreferencias()
+        LeerDatosDePreferenciasEncryp()
 
         //Eventos clic
         buttonLogin.setOnClickListener {
@@ -43,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
             //Validaciones de datos requeridos y formatos
             if(!validateRequiredData())
                 return@setOnClickListener
-            GuardarDatosEnPreferencias()
+            GuardarDatosEnPreferenciasEncryp()
             //Si pasa validación de datos requeridos, ir a pantalla principal
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra(EXTRA_LOGIN, email)
@@ -77,6 +78,7 @@ class LoginActivity : AppCompatActivity() {
         return true
     }
 
+    // Shared Preferences
     private fun LeerDatosDePreferencias(){
         val listadoLeido = manejadorArchivo.ReadInformation()
         if(listadoLeido.first != null){
@@ -86,6 +88,7 @@ class LoginActivity : AppCompatActivity() {
         editTextPassword.setText ( listadoLeido.second )
     }
 
+    // Shared Preferences
     private fun GuardarDatosEnPreferencias(){
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
@@ -98,6 +101,25 @@ class LoginActivity : AppCompatActivity() {
         }
         manejadorArchivo.SaveInformation(listadoAGrabar)
     }
+
+    // Encrypted Shared Preferences
+    private fun GuardarDatosEnPreferenciasEncryp(){
+        val email = editTextEmail.text.toString()
+        val clave = editTextPassword.text.toString()
+
+        manejadorArchivo = EncryptedSharedPreferencesManager(this)
+        manejadorArchivo.SaveInformation(email to clave)
+    }
+
+    // Encrypted Shared Preferences
+    private fun LeerDatosDePreferenciasEncryp(){
+        var datoLeido : Pair<String, String>
+
+        manejadorArchivo = EncryptedSharedPreferencesManager(this)
+        datoLeido = manejadorArchivo.ReadInformation()
+        Log.d("TAG", "EncriptedSharedPreferencesManager " + datoLeido.toList().toString())
+    }
+
 
     override fun onDestroy() {
         mediaPlayer.release()
